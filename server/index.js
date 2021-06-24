@@ -5,93 +5,51 @@ const port = 5000;
 const fs = require('fs');
 const path = require('path');
 
-// Connect To Database (Explore "pool")
+// Connect To Database
 const { Client } = require('pg');
 const client = new Client({
   user: 'neildudani',
-  database: 'test'
+  database: 'reviews_sdc'
 })
 
 client.connect();
 
-// ******************************* PHOTOS *********************** \\
-const photos = './../csv_data/reviews_photos.csv';
-const photosPath = path.join(__dirname, photos);
-const photosReadStream = fs.createReadStream(photosPath, {encoding: 'utf8'})
-let photosLoaded = false;
-let photosLineRemainder = '';
+// ******************************* CREATE META *********************** \\
+const createMeta = async function () {
 
-function loadPhotos() {
+    let sqlA = `INSERT INTO meta (product_id) SELECT DISTINCT product_id FROM characteristics;`;
+    await client.query(sqlA);
 
-  photosReadStream.on('data', async (chunk) => {
-    photosReadStream.pause();
-    let lines = chunk.split('\n');
-    lines[0] = photosLineRemainder + lines[0];
-    photosLineRemainder = lines.pop();
-    let firstLine = lines[0];
-    let i = 0;
-    while (i < lines.length) {
-      let splitArray = lines[i].split(',');
-      let photo_id = splitArray[0];
-      let review_id = splitArray[1];
-      let url = splitArray[2];
-      let sql = `INSERT INTO photos (photo_id, review_id, url) VALUES (${photo_id}, ${review_id}, '${url}')`;
-      await client.query(sql);
-      i++;
-      if (i === lines.length - 1) {
-        photosReadStream.resume();
-      }
-    }
-  });
-
-  photosReadStream.on('end', () => {
-    console.log('Finished photos!');
-    loadCharacteristics();
-  });
+    let sqlB = `UPDATE meta
+    SET
+      product_id=subquery.product_id,
+      ratingOneCount=subquery.ratingOneCount,
+      ratingTwoCount=subquery.ratingTwoCount,
+      ratingThreeCount=subquery.ratingThreeCount,
+      ratingFourCount=subquery.ratingFourCount,
+      ratingFiveCount=subquery.ratingFiveCount
+    FROM (
+      SELECT
+        r.product_id AS product_id,
+        SUM (CASE WHEN cr.rating = 1 THEN 1 ELSE 0 END) AS ratingOneCount,
+        SUM (CASE WHEN cr.rating = 2 THEN 1 ELSE 0 END) AS ratingTwoCount,
+        SUM (CASE WHEN cr.rating = 3 THEN 1 ELSE 0 END) AS ratingThreeCount,
+        SUM (CASE WHEN cr.rating = 4 THEN 1 ELSE 0 END) AS ratingFourCount,
+        SUM (CASE WHEN cr.rating = 5 THEN 1 ELSE 0 END) AS ratingFiveCount
+      FROM
+        characteristic_reviews cr
+      LEFT JOIN
+        reviews r
+      ON r.review_id = cr.review_id
+      GROUP BY 1
+    ) AS subquery
+    WHERE meta.product_id = subquery.product_id;`;
+    await client.query(sqlB);
 
 };
 
-// ******************************* CHARACTERISTICS *********************** \\
-const characteristics = './../csv_data/characteristics.csv';
-const characteristicsPath = path.join(__dirname, characteristics);
-const characteristicsReadStream = fs.createReadStream(characteristicsPath, {encoding: 'utf8'})
-let characteristicsLoaded = false;
-let characteristicsLineRemainder = '';
 
-function loadCharacteristics() {
-
-  characteristicsReadStream.on('data', async (chunk) => {
-    characteristicsReadStream.pause();
-    let lines = chunk.split('\n');
-    lines[0] = characteristicsLineRemainder + lines[0];
-    characteristicssLineRemainder = lines.pop();
-    let firstLine = lines[0];
-    let i = 0;
-    while (i < lines.length) {
-      let splitArray = lines[i].split(',');
-      let characteristic_id = splitArray[0];
-      let product_id = splitArray[1];
-      let characteristic = splitArray[2];
-      let sql = `INSERT INTO characteristics (characteristic_id, product_id, characteristic) VALUES (${characteristic_id}, ${product_id}, '${characteristic}')`;
-      await client.query(sql);
-      i++;
-      if (i === lines.length - 1) {
-        characteristicsReadStream.resume();
-      }
-    }
-  });
-
-  characteristicsReadStream.on('end', () => {
-    console.log('Finished characteristics!');
-  });
-
-};
-// ******************************* META *********************** \\
-
-// ******************************* REVIEWS *********************** \\
-
-//Begin chain of createReadStream events
-loadPhotos();
+createMeta();
 
 // Handle Requests
 app.get('/', (req, res) => {
