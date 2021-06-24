@@ -4,15 +4,7 @@ CREATE DATABASE test;
 
 \c test;
 
-CREATE TABLE names (
-  id INT PRIMARY KEY,
-  name VARCHAR(30)
-  );
-
-INSERT INTO names (id, name) VALUES (1, 'neil');
-
 CREATE TABLE meta (
-  id INT PRIMARY KEY,
   product_id INT NOT NULL,
   ratingOneCount INT DEFAULT 0,
   ratingTwoCount INT DEFAULT 0,
@@ -45,9 +37,9 @@ CREATE TABLE photos (
   );
 
 CREATE TABLE characteristics (
-  id INT PRIMARY KEY,
+  characteristic_id INT PRIMARY KEY,
   product_id INT NOT NULL,
-  characteristic_id INT NOT NULL,
+  characteristic VARCHAR(30),
   ratingOneCount INT DEFAULT 0,
   ratingTwoCount INT DEFAULT 0,
   ratingThreeCount INT DEFAULT 0,
