@@ -4,16 +4,23 @@ CREATE DATABASE test;
 
 \c test;
 
+CREATE TABLE names (
+  id INT PRIMARY KEY,
+  name VARCHAR(30)
+  );
+
+INSERT INTO names (id, name) VALUES (1, 'neil');
+
 CREATE TABLE meta (
   id INT PRIMARY KEY,
   product_id INT NOT NULL,
-  ratingOneCount INT,
-  ratingTwoCount INT,
-  ratingThreeCount INT,
-  ratingFourCount INT,
-  ratingFiveCount INT,
-  recommendedFalseCount INT,
-  recommendedTrueCount INT
+  ratingOneCount INT DEFAULT 0,
+  ratingTwoCount INT DEFAULT 0,
+  ratingThreeCount INT DEFAULT 0,
+  ratingFourCount INT DEFAULT 0,
+  ratingFiveCount INT DEFAULT 0,
+  recommendedFalseCount INT DEFAULT 0,
+  recommendedTrueCount INT DEFAULT 0
   );
 
 CREATE TABLE reviews (
@@ -41,9 +48,9 @@ CREATE TABLE characteristics (
   id INT PRIMARY KEY,
   product_id INT NOT NULL,
   characteristic_id INT NOT NULL,
-  ratingOneCount INT,
-  ratingTwoCount INT,
-  ratingThreeCount INT,
-  ratingFourCount INT,
-  ratingFiveCount INT
+  ratingOneCount INT DEFAULT 0,
+  ratingTwoCount INT DEFAULT 0,
+  ratingThreeCount INT DEFAULT 0,
+  ratingFourCount INT DEFAULT 0,
+  ratingFiveCount INT DEFAULT 0
   );
