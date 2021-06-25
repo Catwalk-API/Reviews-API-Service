@@ -15,9 +15,52 @@ const client = new Client({
 client.connect();
 
 // Handle Requests
-app.get('/reviews', (req, res) => {
+app.get('/reviews', async (req, res) => {
   let productId = req.query.product_id;
-  res.send('detailed reviews!')
+  let count = req.query.count || 5;
+  let sqlA = `SELECT review_id, rating, summary, recommend, response, body, date, reviewer_name, helpfulnessCount FROM reviews WHERE product_id = ${productId} LIMIT ${count}`;
+  let results = await client.query(sqlA);
+  let reviewIds = [];
+  for (var j = 0; j < results.rows.length; j++) {
+    reviewIds.push(results.rows[j].review_id)
+  }
+  let reviewIdPhotos = [];
+  for (var k = 0; k < reviewIds.length; k++) {
+    let reviewId = reviewIds[k];
+    let sqlB = `SELECT photo_id, url FROM photos WHERE review_id = ${reviewId};`;
+    let photosObj = await client.query(sqlB);
+    for (var l = 0; l < photosObj.rows.length; l++) {
+      for (var key in photosObj.rows[l]) {
+        if (key === 'photo_id') {
+          photosObj.rows[l].id = photosObj.rows[l].photo_id;
+          delete photosObj.rows[l].photo_id;
+        }
+      }
+    }
+    reviewIdPhotos.push(photosObj.rows);
+  }
+
+  let reviewsArray = [];
+  for (var i = 0; i < results.rows.length; i++) {
+    let review = {};
+    review.review_id = results.rows[i].review_id;
+    review.rating = results.rows[i].rating;
+    review.summary = results.rows[i].summary;
+    review.response = results.rows[i].response;
+    review.body = results.rows[i].body;
+    review.date = results.rows[i].date;
+    review.reviewer_name = results.rows[i].reviewer_name;
+    review.helpfulness = results.rows[i].helpfulnesscount;
+    review.photos = reviewIdPhotos[i];
+    reviewsArray.push(review);
+  }
+  let responseObject = {
+    product: productId,
+    page: 0,
+    count: count,
+    results: reviewsArray
+  };
+  res.send(responseObject);
 });
 
 app.get('/reviews/meta', async (req, res) => {
