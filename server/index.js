@@ -27,7 +27,7 @@ app.get('/reviews/meta', (req, res) => {
 
 app.put('/reviews/:review_id/helpful', async (req, res) => {
   let reviewId = req.params.review_id;
-  let sqlA = `SELECT helpfulnessCount FROM reviews WHERE review_id = ${reviewId}`;
+  let sqlA = `SELECT helpfulnessCount FROM reviews WHERE review_id = ${reviewId};`;
   let results = await client.query(sqlA);
   let currentCount = results.rows[0].helpfulnesscount;
   let updatedCount = currentCount + 1;
@@ -36,13 +36,20 @@ app.put('/reviews/:review_id/helpful', async (req, res) => {
                 SET
                   helpfulnessCount = ${updatedCount}
                 WHERE review_id = ${reviewId}
-            `
+            ;`
   await client.query(sqlB);
   res.send('helpful');
 });
 
-app.put('/reviews/:review_id/report', (req, res) => {
+app.put('/reviews/:review_id/report', async (req, res) => {
   let reviewId = req.params.review_id;
+  let sql = `
+              UPDATE reviews
+                SET
+                  reported = 'true'
+              WHERE review_id = ${reviewId}
+            ;`
+  await client.query(sql);
   res.send('report');
 });
 
