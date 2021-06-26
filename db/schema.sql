@@ -143,3 +143,9 @@ UPDATE characteristics
   ) AS subquery
   WHERE characteristics.characteristic_id = subquery.characteristic_id;
 
+-- Reset Id For All Tables
+SELECT setval('meta_product_id_seq', (SELECT MAX(product_id) FROM meta));
+SELECT setval('reviews_review_id_seq', (SELECT MAX(review_id) FROM reviews));
+SELECT setval('photos_photo_id_seq', (SELECT MAX(photo_id) FROM photos));
+SELECT setval('characteristics_characteristic_id_seq', (SELECT MAX(characteristic_id) FROM characteristics));
+SELECT setval('characteristic_reviews_id_seq', (SELECT MAX(id) FROM characteristic_reviews));
