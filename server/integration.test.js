@@ -1,3 +1,5 @@
+//The goal of integration.test is to confirm that there is a succesful connection between the server and the database. We do not want to hit the real database for 2 reasons: #1) on post requests we want to make sure that what we actually posted got added to the database, and that the record was not there by mistake. #2) If the test database is a replica of the real database, we do not want to manipulate the real database. This test builds on the unit tests by confirming that the server is able to send and receive information from the database. This assumes the front-end is working correctly. The challenge with the integration tests is that it does not tell you whether the server is not working properly or if the database is not working properly. The unit tests help to isolate these problems as you are not communicating over the network.
+
 const request = require("supertest");
 const { app, client } = require('./app.js');
 const port = 5001;
@@ -6,7 +8,7 @@ var server;
 beforeAll(() => {
   return new Promise((resolve, reject) => {
     server = app.listen(port, () => {
-      console.log("Test server has started!");
+      console.log(`Listening on port ${port}!`);
       client.connect()
         .then(() => {
           resolve();
@@ -190,7 +192,7 @@ afterAll(() => {
   client.end();
 })
 
-describe('server tests', () => {
+describe('integration tests between server and db', () => {
 
   it('Testing to see if Jest works', () => {
     expect(1).toBe(1);
