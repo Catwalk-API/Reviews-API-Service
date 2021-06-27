@@ -113,6 +113,7 @@ app.get('/reviews/meta', async (req, res) => {
 });
 
 app.put('/reviews/:review_id/helpful', async (req, res) => {
+  console.log('productreviewId: ', req.params.review_id);
   let reviewId = req.params.review_id;
   let sqlA = `SELECT helpfulnessCount FROM reviews WHERE review_id = ${reviewId};`;
   let results = await client.query(sqlA);

@@ -1,0 +1,51 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: Warm up
+    - duration: 120
+      arrivalRate: 5
+      rampTo: 50
+      name: Ramp up load
+    - duration: 200
+      arrivalRate: 50
+      name: Sustained load
+  payload:
+    path: "./../csv_data/randomProductIds.csv"
+    fields:
+    - "product_id"
+
+scenarios:
+  - name: "Mention that review was helpful"
+    flow:
+      - get:
+          url: "/reviews/meta"
+          qs:
+            product_id: "{{product_id}}"
+      - get:
+          url: "/reviews/"
+          qs:
+            product_id: "{{product_id}}"
+          capture:
+            - json: "$.results[0].review_id"
+              as: "reviewId"
+      - put:
+          url: "/reviews/{{reviewId}}/helpful"
+  - name: "Report review"
+    flow:
+      - get:
+          url: "/reviews/meta"
+          qs:
+            product_id: "{{product_id}}"
+      - get:
+          url: "/reviews/"
+          qs:
+            product_id: "{{product_id}}"
+          capture:
+            - json: "$.results[0].review_id"
+              as: "reviewId"
+      - put:
+          url: "/reviews/{{reviewId}}/report"
+
+
