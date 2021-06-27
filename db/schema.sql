@@ -149,3 +149,8 @@ SELECT setval('reviews_review_id_seq', (SELECT MAX(review_id) FROM reviews));
 SELECT setval('photos_photo_id_seq', (SELECT MAX(photo_id) FROM photos));
 SELECT setval('characteristics_characteristic_id_seq', (SELECT MAX(characteristic_id) FROM characteristics));
 SELECT setval('characteristic_reviews_id_seq', (SELECT MAX(id) FROM characteristic_reviews));
+
+--Create Indexes
+CREATE INDEX reviews_product_id_asc ON reviews(product_id ASC);
+CREATE INDEX photos_review_id_asc ON photos(review_id ASC);
+CREATE INDEX characteristics_product_id_asc ON characteristics(product_id ASC);

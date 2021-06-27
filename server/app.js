@@ -84,7 +84,12 @@ app.get('/reviews/meta', async (req, res) => {
     let fiveCount = characteristics.rows[i].ratingfivecount;
     let totalReviews = oneCount + twoCount + threeCount + fourCount + fiveCount;
     let totalScore = oneCount * 1 + twoCount * 2 + threeCount * 3 + fourCount * 4 + fiveCount * 5;
-    let average = totalScore / totalReviews;
+    let average;
+    if (totalReviews === 0) {
+      average = 'No reviews'
+    } else {
+      average = totalScore / totalReviews;
+    }
     characteristicsObject[characteristicName] = {};
     characteristicsObject[characteristicName].id = characteristics.rows[i].characteristic_id;
     characteristicsObject[characteristicName].value = average.toString();
