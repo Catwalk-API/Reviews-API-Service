@@ -1,7 +1,7 @@
-//The goal of integration.test is to confirm that there is a succesful connection between the server and the database. We do not want to hit the real database for 2 reasons: #1) on post requests we want to make sure that what we actually posted got added to the database, and that the record was not there by mistake. #2) If the test database is a replica of the real database, we do not want to manipulate the real database. This test builds on the unit tests by confirming that the server is able to send and receive information from the database. This assumes the front-end is working correctly. The challenge with the integration tests is that it does not tell you whether the server is not working properly or if the database is not working properly. The unit tests help to isolate these problems as you are not communicating over the network.
+//The goal of integration.test is to confirm that there is a succesful connection between the server and the database. We do not want to hit the real database for 2 reasons: #1) on post requests we want to make sure that what we actually posted got added to the database, and that the record was not there by mistake. #2) If the test database is a replica of the real database, we do not want to manipulate the real database. This test builds on the unit tests by confirming that the server is able to send and receive information from the database. This assumes the front-end is working correctly. The challenge with the integration tests is that it does not tell you whether the server is not working properly or if the database is not working properly. The unit tests help to isolate these problems as you are not communicating over the network. The next step after integration testing is typically end-to-end testing, however we cannot do that as we cannot mimic the user without access to the front-end code.
 
 const request = require("supertest");
-const { app, client } = require('./app.js');
+const { app, client } = require('./../server/app.js');
 const port = 5001;
 var server;
 
@@ -18,8 +18,7 @@ beforeAll(() => {
 });
 
 beforeEach((done) => {
-  let sql = `
-  DROP TABLE IF EXISTS meta;
+  let sql = `DROP TABLE IF EXISTS meta;
   CREATE TABLE meta (
     product_id serial PRIMARY KEY,
     ratingOneCount INT DEFAULT 0,
@@ -33,18 +32,18 @@ beforeEach((done) => {
 
   DROP TABLE IF EXISTS reviews;
   CREATE TABLE reviews (
-     review_id serial PRIMARY KEY,
-     product_id INT NOT NULL,
-     rating INT,
-     date TEXT,
-     summary VARCHAR(1000),
-     body VARCHAR(1000),
-     recommend boolean,
-     reported boolean,
-     reviewer_name VARCHAR(60),
-     reviewer_email VARCHAR(60),
-     response VARCHAR,
-     helpfulnessCount INT
+      review_id serial PRIMARY KEY,
+      product_id INT NOT NULL,
+      rating INT,
+      date TEXT,
+      summary VARCHAR(1000),
+      body VARCHAR(1000),
+      recommend boolean,
+      reported boolean,
+      reviewer_name VARCHAR(60),
+      reviewer_email VARCHAR(60),
+      response VARCHAR,
+      helpfulnessCount INT
     );
 
   DROP TABLE IF EXISTS photos;
@@ -87,11 +86,11 @@ beforeEach((done) => {
     (2, 'Size')
   ;
 
-  INSERT INTO reviews (product_id, rating, summary, body, recommend, reviewer_name, reviewer_email)
+  INSERT INTO reviews (product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulnesscount)
   VALUES
-    (1, 3, 'SummaryOneA', 'BodyOneA', 'true', 'Neil', 'Neil@123.com'),
-    (1, 4, 'SummaryOneB', 'BodyOneB', 'false', 'Fab', 'Fab@456.com'),
-    (2, 5, 'SummaryTwoA', 'BodyTwoA', 'false', 'Alex', 'Alex@789.com')
+    (1, 3, '1596080481467', 'SummaryOneA', 'BodyOneA', 'true', 'false', 'Neil', 'Neil@123.com', 'null', 0),
+    (1, 4, '1610178433963', 'SummaryOneB', 'BodyOneB', 'false', 'false', 'Fab', 'Fab@456.com', 'null', 0),
+    (2, 5, '1594890076276', 'SummaryTwoA', 'BodyTwoA', 'false', 'false', 'Alex', 'Alex@789.com', 'null', 0)
   ;
 
   INSERT INTO characteristic_reviews (characteristic_id, review_id, rating)
@@ -116,7 +115,7 @@ beforeEach((done) => {
 
   -- Update Meta
 
-UPDATE meta
+  UPDATE meta
   SET
     ratingOneCount=subquery.ratingOneCount,
     ratingTwoCount=subquery.ratingTwoCount,
@@ -141,9 +140,9 @@ UPDATE meta
   ) AS subquery
   WHERE meta.product_id = subquery.product_id;
 
--- Update Characteristics
+  -- Update Characteristics
 
-UPDATE characteristics
+  UPDATE characteristics
   SET
     product_id=subquery.product_id,
     ratingOneCount=subquery.ratingOneCount,
@@ -174,13 +173,12 @@ UPDATE characteristics
   ) AS subquery
   WHERE characteristics.characteristic_id = subquery.characteristic_id;
 
--- Reset Id For All Tables
-SELECT setval('meta_product_id_seq', (SELECT MAX(product_id) FROM meta));
-SELECT setval('reviews_review_id_seq', (SELECT MAX(review_id) FROM reviews));
-SELECT setval('photos_photo_id_seq', (SELECT MAX(photo_id) FROM photos));
-SELECT setval('characteristics_characteristic_id_seq', (SELECT MAX(characteristic_id) FROM characteristics));
-SELECT setval('characteristic_reviews_id_seq', (SELECT MAX(id) FROM characteristic_reviews));
-  `;
+  -- Reset Id For All Tables
+  SELECT setval('meta_product_id_seq', (SELECT MAX(product_id) FROM meta));
+  SELECT setval('reviews_review_id_seq', (SELECT MAX(review_id) FROM reviews));
+  SELECT setval('photos_photo_id_seq', (SELECT MAX(photo_id) FROM photos));
+  SELECT setval('characteristics_characteristic_id_seq', (SELECT MAX(characteristic_id) FROM characteristics));
+  SELECT setval('characteristic_reviews_id_seq', (SELECT MAX(id) FROM characteristic_reviews));`;
   client.query(sql)
     .then(() => {
       done();
