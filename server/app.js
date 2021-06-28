@@ -8,10 +8,22 @@ const { sqlA } = require('./queries.js');
 
 // Connect To Database
 const { Client } = require('pg');
-const client = new Client({
-  user: 'neildudani',
-  database: db
-})
+if (db === 'reviews_sdc') {
+  const client = new Client({
+    user: 'postgres',
+    database: db,
+    host: 'db',
+    password: 'mysecretpassword',
+    port: 5432
+  })
+}
+
+if (db === 'test_reviews_sdc') {
+  const client = new Client({
+    user: 'neildudani',
+    database: db,
+  })
+}
 
 // Handle Requests
 app.get('/reviews', async (req, res) => {
