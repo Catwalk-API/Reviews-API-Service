@@ -24,7 +24,7 @@ scenarios:
           url: "/reviews/meta"
           qs:
             product_id: "{{product_id}}"
-      - get:
-          url: "/reviews/"
-          qs:
-            product_id: "{{product_id}}"
+      # - get:
+      #     url: "/reviews/"
+      #     qs:
+      #       product_id: "{{product_id}}"
