@@ -8,8 +8,10 @@ const { sqlA } = require('./queries.js');
 
 // Connect To Database
 const { Client } = require('pg');
+var client;
+
 if (db === 'reviews_sdc') {
-  const client = new Client({
+  client = new Client({
     user: 'postgres',
     database: db,
     host: 'db',
@@ -19,7 +21,7 @@ if (db === 'reviews_sdc') {
 }
 
 if (db === 'test_reviews_sdc') {
-  const client = new Client({
+  client = new Client({
     user: 'neildudani',
     database: db,
   })
