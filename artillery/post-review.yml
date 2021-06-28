@@ -16,6 +16,7 @@ config:
     path: "./../csv_data/randomProductIds.csv"
     fields:
     - "product_id"
+  processor: "./post-review-helpers.js"
 
 scenarios:
   - name: "Fetch review meta + detail"
@@ -24,7 +25,20 @@ scenarios:
           url: "/reviews/meta"
           qs:
             product_id: "{{product_id}}"
+          afterResponse: "transformCharacteristics"
       - get:
           url: "/reviews/"
           qs:
             product_id: "{{product_id}}"
+      - post:
+          url: "/reviews"
+          json:
+            product_id: "{{product_id}}"
+            rating: 5
+            summary: "Artillery summary"
+            photos: ["https://upload.wikimedia.org/wikipedia/commons/d/d1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg"]
+            body: "Artillery body"
+            recommend: "false"
+            name: "Artillery-nick-name"
+            email: "Artillery@artillery.com"
+            characteristics: "{{characteristicsPostRequestObject}}"

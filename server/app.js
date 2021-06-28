@@ -113,7 +113,6 @@ app.get('/reviews/meta', async (req, res) => {
 });
 
 app.put('/reviews/:review_id/helpful', async (req, res) => {
-  console.log('productreviewId: ', req.params.review_id);
   let reviewId = req.params.review_id;
   let sqlA = `SELECT helpfulnessCount FROM reviews WHERE review_id = ${reviewId};`;
   let results = await client.query(sqlA);
@@ -158,6 +157,8 @@ app.post('/reviews', async (req, res) => {
   let response = 'null';
   let helpfulnessCount = 0;
 
+  // console.log('pi: ', productId, 'r: ', rating, 'summary: ', summary, 'body: ', body, 'recommend: ', recommend, 'name: ', reviewer_name, 'email: ', reviewer_email);
+
   let sqlB = `INSERT INTO reviews (product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulnessCount) VALUES (${productId}, ${rating}, '${date}', '${summary}', '${body}', ${recommend}, ${reported}, '${reviewer_name}', '${reviewer_email}', '${response}', ${helpfulnessCount});`;
   let responseB = await client.query(sqlB);
 
@@ -193,6 +194,7 @@ app.post('/reviews', async (req, res) => {
   let responseE = await client.query(sqlE);
 
   let characteristics = req.body.characteristics;
+  console.log('characteristics: ', characteristics);
   for (var characteristic in characteristics) {
     let chrRating = characteristics[characteristic];
     let sqlF = `INSERT INTO characteristic_reviews (characteristic_id, review_id, rating) VALUES (${characteristic}, ${nextReviewId}, ${chrRating});`;

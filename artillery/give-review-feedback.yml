@@ -1,4 +1,5 @@
 config:
+  # For learning purposes we are hitting the real database in development, but ideally we would be pointing the target to a test database (which would sit on another port)
   target: "http://localhost:5000"
   phases:
     - duration: 60
