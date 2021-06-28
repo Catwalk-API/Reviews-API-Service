@@ -194,7 +194,6 @@ app.post('/reviews', async (req, res) => {
   let responseE = await client.query(sqlE);
 
   let characteristics = req.body.characteristics;
-  console.log('characteristics: ', characteristics);
   for (var characteristic in characteristics) {
     let chrRating = characteristics[characteristic];
     let sqlF = `INSERT INTO characteristic_reviews (characteristic_id, review_id, rating) VALUES (${characteristic}, ${nextReviewId}, ${chrRating});`;

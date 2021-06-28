@@ -16,7 +16,7 @@ config:
     path: "./../csv_data/randomProductIds.csv"
     fields:
     - "product_id"
-  processor: "./post-review-helpers.js"
+  processor: "./post-request-helpers.js"
 
 scenarios:
   - name: "Fetch review meta + detail"
