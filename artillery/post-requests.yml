@@ -13,7 +13,7 @@ config:
       arrivalRate: 50
       name: Sustained load
   payload:
-    path: "./../csv_data/randomProductIds.csv"
+    path: "./../artillery_data/randomProductIds.csv"
     fields:
     - "product_id"
   processor: "./post-request-helpers.js"
