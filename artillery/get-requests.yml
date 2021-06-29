@@ -1,0 +1,30 @@
+config:
+  # For learning purposes we are hitting the real database in development, but ideally we would be pointing the target to a test database (which would sit on another port)
+  target: "http://localhost:5000"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: Warm up
+    - duration: 120
+      arrivalRate: 5
+      rampTo: 50
+      name: Ramp up load
+    - duration: 200
+      arrivalRate: 50
+      name: Sustained load
+  payload:
+    path: "./../csv_data/randomProductIds.csv"
+    fields:
+    - "product_id"
+
+scenarios:
+  - name: "Fetch review meta + detail"
+    flow:
+      - get:
+          url: "/reviews/meta"
+          qs:
+            product_id: "{{product_id}}"
+      - get:
+          url: "/reviews/"
+          qs:
+            product_id: "{{product_id}}"

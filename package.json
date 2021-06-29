@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "start": "nodemon server/index.js",
+    "test": "jest --testEnvironment jsdom --coverage --detectOpenHandles"
+  },
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.14.1",
+    "express": "^4.17.1",
+    "jest": "^27.0.5",
+    "nodemon": "^2.0.7",
+    "pg": "^8.6.0",
+    "supertest": "^6.1.3"
+  }
+}
