@@ -1,5 +1,4 @@
 node_modules
 coverage
-artillery_data
-config.js
+npm-debug.log
 newrelic_agent.log
